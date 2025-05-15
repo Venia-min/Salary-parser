@@ -7,7 +7,7 @@ COLUMN_ALIASES = {
     'rate': {'hourly_rate', 'rate', 'salary'},
 }
 
-def normalize_header(header, column_aliases):
+def normalize_header(header, column_aliases) -> List[str]:
     """
     Заменяет заголовки CSV по известным синонимам.
     Остальные оставляет без изменений.
@@ -50,6 +50,8 @@ def read_csv_file(file_path: str) -> List[Dict[str, str]]:
 
         values = [v.strip() for v in line.split(',')]
         if len(values) != len(normalized_header):
+            print(f"Ошибка: неверное количество столбцов в строке: {line}."
+                  f"Ожидается {len(normalized_header)}, получено {len(values)}")
             continue
 
         row = dict(zip(normalized_header, values))
