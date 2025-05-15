@@ -2,17 +2,22 @@ from collections import defaultdict
 from pathlib import Path
 
 from output import SAVE_VARIANTS
-from parser.csv_parser import parse_and_combine
+from parser.csv_parser import CsvReader
+from parser.payout_parser import PayoutParser
 
 
 class PayoutReport:
-    def __init__(self, files: list[str]):
-        self.files: list[str] = files
+    def __init__(self, files: list[str], reader: CsvReader, aliases: dict):
+        self.files = files
+        self.reader = reader
+        self.aliases = aliases
         self.raw_data: list[dict] = []
         self.report_data: dict[str, dict] = {}
 
     def load(self) -> None:
-        self.raw_data = parse_and_combine(self.files)
+        self.raw_data = PayoutParser.load(
+            self.files
+        )
 
     def format(self) -> None:
         """
