@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 from output import SAVE_VARIANTS
 from reports import get_report_class, REPORT_VARIANTS

@@ -3,21 +3,21 @@ from pathlib import Path
 
 from output import SAVE_VARIANTS
 from parser.csv_parser import CsvReader
-from parser.payout_parser import PayoutParser
+from parser.payout_parser import PayoutParser, COLUMN_ALIASES
 
 
 class PayoutReport:
-    def __init__(self, files: list[str], reader: CsvReader, aliases: dict):
+    def __init__(self, files: list[str]):
         self.files = files
-        self.reader = reader
-        self.aliases = aliases
+        self.parser = PayoutParser(CsvReader(), COLUMN_ALIASES)
         self.raw_data: list[dict] = []
         self.report_data: dict[str, dict] = {}
 
     def load(self) -> None:
-        self.raw_data = PayoutParser.load(
-            self.files
-        )
+        """
+        Загружает данные из файлов.
+        """
+        self.raw_data = self.parser.load(self.files)
 
     def format(self) -> None:
         """

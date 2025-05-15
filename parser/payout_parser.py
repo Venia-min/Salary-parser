@@ -1,4 +1,3 @@
-from parser.csv_parser import CsvReader
 from parser.utils import normalize_header
 
 
@@ -43,7 +42,7 @@ class PayoutParser:
             files: list[str],
     ) -> list[dict]:
         """
-        Обрабатывает список файлов с помощью PayoutCsvParser и объединяет результаты.
+        Обрабатывает список файлов и объединяет результаты.
         :param files: Список путей к файлам
         :return: Объединенные данные из всех файлов
         """

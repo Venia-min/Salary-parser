@@ -1,6 +1,9 @@
 import os
 
 class CsvReader:
+    """
+    Базовый класс для чтения CSV-файлов.
+    """
     def read(self, file_path: str) -> tuple[list[str], list[list[str]]]:
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f"Файл не найден: {file_path}")
