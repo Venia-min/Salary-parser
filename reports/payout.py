@@ -28,7 +28,7 @@ class PayoutReport:
         )
         for row in self.raw_data:
             try:
-                hours = float(row.get("hours_worked", 0))
+                hours = float(row.get("hours", 0))
                 rate = float(row.get("rate", 0))
                 payout = round(hours * rate, 2)
             except (ValueError, TypeError):

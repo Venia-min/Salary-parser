@@ -4,6 +4,7 @@ from parser.utils import normalize_header
 # Наименования полей у которых есть синонимы
 COLUMN_ALIASES = {
     'rate': {'hourly_rate', 'rate', 'salary'},
+    'hours': {'hours_worked'},
 }
 
 
