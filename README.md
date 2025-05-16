@@ -9,7 +9,7 @@
 Скачайте проект из GitHub:
 
 ```bash
-git clone https://github.com/yourusername/salary-report.git
+git clone https://github.com/venia-min/salary-report.git
 cd salary-report
 ```
 
@@ -52,7 +52,7 @@ data/default_report.json (для JSON).
 ```python
 from .new_report import NewReport
 
-REPORT_CLASSES = {
+REPORT_VARIANTS = {
     "payout": ReportPayout,
     "newreport": NewReport,
 }
