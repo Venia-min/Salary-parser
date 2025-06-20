@@ -3,8 +3,8 @@ from parser.utils import normalize_header
 
 # Наименования полей у которых есть синонимы
 COLUMN_ALIASES = {
-    'rate': {'hourly_rate', 'rate', 'salary'},
-    'hours': {'hours_worked'},
+    "rate": {"hourly_rate", "rate", "salary"},
+    "hours": {"hours_worked"},
 }
 
 
@@ -29,8 +29,10 @@ class PayoutParser:
 
         for values in rows:
             if len(values) != len(normalized_header):
-                print(f"Ошибка: неверное количество столбцов в строке: {values}."
-                      f"Ожидается {len(normalized_header)}, получено {len(values)}")
+                print(
+                    f"Ошибка: неверное количество столбцов в строке: {values}."
+                    f"Ожидается {len(normalized_header)}, получено {len(values)}"
+                )
                 continue
 
             row = dict(zip(normalized_header, values))
@@ -39,8 +41,8 @@ class PayoutParser:
         return data
 
     def load(
-            self,
-            files: list[str],
+        self,
+        files: list[str],
     ) -> list[dict]:
         """
         Обрабатывает список файлов и объединяет результаты.
@@ -52,5 +54,3 @@ class PayoutParser:
             data = self.parse(file_path)
             combined_data.extend(data)
         return combined_data
-
-

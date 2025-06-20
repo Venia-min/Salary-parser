@@ -1,9 +1,11 @@
 import os
 
+
 class CsvReader:
     """
     Базовый класс для чтения CSV-файлов.
     """
+
     def read(self, file_path: str) -> tuple[list[str], list[list[str]]]:
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f"Файл не найден: {file_path}")
@@ -20,7 +22,7 @@ class CsvReader:
             line = line.strip()
             if not line:
                 continue
-            values = [v.strip() for v in line.split(',')]
+            values = [v.strip() for v in line.split(",")]
             rows.append(values)
 
         return header, rows

@@ -1,9 +1,7 @@
 import json
-
-import pytest
+import os
 import subprocess
 import sys
-import os
 
 
 def create_temp_csv(tmp_path, filename, content):
@@ -21,7 +19,7 @@ def test_cli_console_output(tmp_path):
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        cwd=os.getcwd()
+        cwd=os.getcwd(),
     )
 
     assert result.returncode == 0
@@ -37,16 +35,20 @@ def test_cli_json_output(tmp_path):
 
     result = subprocess.run(
         [
-            sys.executable, "main.py",
+            sys.executable,
+            "main.py",
             csv_path,
-            "--report", "payout",
-            "--output", "json",
-            "--output-path", str(output_path)
+            "--report",
+            "payout",
+            "--output",
+            "json",
+            "--output-path",
+            str(output_path),
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
-        cwd=os.getcwd()
+        cwd=os.getcwd(),
     )
 
     expected_file = tmp_path / "output.json"

@@ -1,5 +1,3 @@
-import pytest
-
 from reports.payout import PayoutReport
 
 
@@ -11,9 +9,7 @@ def report_format(raw_data):
 
 
 def test_format_single_entry():
-    raw_data = [
-        {"department": "Design", "name": "Alice", "rate": "50", "hours": "160"}
-    ]
+    raw_data = [{"department": "Design", "name": "Alice", "rate": "50", "hours": "160"}]
 
     report_data = report_format(raw_data)
 
@@ -22,15 +18,20 @@ def test_format_single_entry():
     assert dept["total_hours"] == 160.0
     assert dept["total_payout"] == 8000.0
     assert dept["employees"] == [
-        {"department": "Design", "name": "Alice", "hours": 160.0, "rate":
-            50.0, "payout": 8000.0}
+        {
+            "department": "Design",
+            "name": "Alice",
+            "hours": 160.0,
+            "rate": 50.0,
+            "payout": 8000.0,
+        }
     ]
 
 
 def test_format_multiple_departments():
     raw_data = [
         {"department": "Design", "name": "Bob", "rate": "40", "hours": "150"},
-        {"department": "Marketing", "name": "Alice", "rate": "60", "hours": "100"}
+        {"department": "Marketing", "name": "Alice", "rate": "60", "hours": "100"},
     ]
 
     report_data = report_format(raw_data)
@@ -44,7 +45,7 @@ def test_format_skips_invalid_entries():
     raw_data = [
         {"department": "Design", "name": "Eve", "rate": "not_a_number", "hours": "150"},
         {"department": "Design", "name": "Eve", "rate": "40", "hours": "invalid"},
-        {"department": "Design", "name": "Eve", "rate": "40", "hours": "150"}
+        {"department": "Design", "name": "Eve", "rate": "40", "hours": "150"},
     ]
 
     report_data = report_format(raw_data)

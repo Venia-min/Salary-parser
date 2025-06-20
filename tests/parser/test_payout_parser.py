@@ -1,5 +1,3 @@
-import pytest
-
 from parser.csv_parser import CsvReader
 from parser.payout_parser import PayoutParser, COLUMN_ALIASES
 
@@ -23,7 +21,7 @@ def test_parse_valid_file(tmp_path):
 
     assert result == [
         {"name": "Alice", "rate": "50", "hours": "160"},
-        {"name": "Bob", "rate": "60", "hours": "150"}
+        {"name": "Bob", "rate": "60", "hours": "150"},
     ]
 
 
@@ -51,9 +49,7 @@ def test_parse_preserves_non_aliased_columns(tmp_path):
 
     result = parse_with_payout_parser(path)
 
-    assert result == [
-        {"email": "alice@example.com", "rate": "40", "hours": "100"}
-    ]
+    assert result == [{"email": "alice@example.com", "rate": "40", "hours": "100"}]
 
 
 def test_load_combines_multiple_files(tmp_path):

@@ -39,10 +39,10 @@ class PayoutReport:
                 "name": row.get("name", "Unknown"),
                 "hours": hours,
                 "rate": rate,
-                "payout": payout
+                "payout": payout,
             }
 
-            dept = entry['department']
+            dept = entry["department"]
             grouped_data[dept]["employees"].append(entry)
             grouped_data[dept]["total_hours"] += hours
             grouped_data[dept]["total_payout"] += payout
@@ -70,9 +70,7 @@ class PayoutReport:
                 hours = int(employee["hours"])
                 rate = int(employee["rate"])
                 payout = int(employee["payout"])
-                print(
-                    f"{'-' * 15:<4} {name:<20}{hours:<8}{rate:<7}"
-                    f"${payout:<6}")
+                print(f"{'-' * 15:<4} {name:<20}{hours:<8}{rate:<7}${payout:<6}")
 
             # Суммы по отделу
             print(f"{'':<36}{total_hours:<7}{'':>8}${total_payout:<6}\n")
@@ -83,15 +81,11 @@ class PayoutReport:
         :param output_format: Формат вывода отчета
         :param output_path: Путь к файлу для сохранения
         """
-        path = str(
-            Path(output_path).with_suffix(f".{output_format}")
-        )
+        path = str(Path(output_path).with_suffix(f".{output_format}"))
         SAVE_VARIANTS[output_format](self.report_data, path)
 
     def generate(
-            self,
-            output_format: str = "console",
-            output_path: str = "data/report_payout"
+        self, output_format: str = "console", output_path: str = "data/report_payout"
     ) -> None:
         """
         Генерирует отчет и выводит его в консоль или сохраняет в файл.
