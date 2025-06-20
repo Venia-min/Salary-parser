@@ -1,7 +1,15 @@
 import argparse
+from pathlib import Path
 
 from output import SAVE_VARIANTS
 from reports import get_report_class, REPORT_VARIANTS
+
+
+def existing_file(path_str: str) -> Path:
+    path = Path(path_str)
+    if not path.is_file():
+        raise argparse.ArgumentTypeError(f"Файл не найден: {path}")
+    return path
 
 
 def parse_args() -> argparse.Namespace:
@@ -11,7 +19,8 @@ def parse_args() -> argparse.Namespace:
         "files",
         metavar="FILE",
         nargs="+",
-        help="Путь к одному или нескольким файлам с информацией",
+        type=existing_file,
+        help="Путь к одному или нескольким файлам с данными",
     )
 
     parser.add_argument(
