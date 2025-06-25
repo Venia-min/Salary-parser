@@ -1,4 +1,5 @@
-from parser.utils import normalize_header
+from models.employee import Employee
+from parsers.utils import normalize_header
 
 
 # Наименования полей у которых есть синонимы
@@ -13,7 +14,7 @@ class PayoutParser:
         self.reader = reader
         self.column_aliases = column_aliases
 
-    def parse(self, file_path: str) -> list[dict]:
+    def parse(self, file_path: str) -> list[Employee]:
         """
         Читает CSV-файл с помощью переданного reader, нормализует заголовки,
         фильтрует строки с неправильным количеством значений.
@@ -36,7 +37,16 @@ class PayoutParser:
                 continue
 
             row = dict(zip(normalized_header, values))
-            data.append(row)
+            try:
+                employee = Employee(
+                    name=row["name"],
+                    department=row["department"],
+                    rate=float(row["rate"]),
+                    hours=float(row["hours"]),
+                )
+                data.append(employee)
+            except (KeyError, ValueError) as e:
+                print(f"Ошибка при обработке строки: {values}. Ошибка: {e}")
 
         return data
 

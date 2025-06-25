@@ -1,11 +1,6 @@
 import pytest
-from parser.csv_parser import CsvReader
 
-
-def create_temp_csv(tmp_path, filename, content):
-    path = tmp_path / filename
-    path.write_text(content)
-    return str(path)
+from parsers.csv_parser import CsvReader
 
 
 def reader_with_csvreader(path: str) -> tuple[list[str], list[list[str]]]:
@@ -13,18 +8,18 @@ def reader_with_csvreader(path: str) -> tuple[list[str], list[list[str]]]:
     return reader.read(path)
 
 
-def test_csvreader_reads_header_and_rows(tmp_path):
+def test_csvreader_reads_header_and_rows(csv_file_factory):
     content = "name,age\nAlice,30\nBob,25\n"
-    path = create_temp_csv(tmp_path, "test.csv", content)
+    path = csv_file_factory("test.csv", content)
     header, rows = reader_with_csvreader(path)
 
     assert header == ["name", "age"]
     assert rows == [["Alice", "30"], ["Bob", "25"]]
 
 
-def test_csvreader_skips_empty_lines(tmp_path):
+def test_csvreader_skips_empty_lines(csv_file_factory):
     content = "name,age\nAlice,30\n\nBob,25\n"
-    path = create_temp_csv(tmp_path, "test.csv", content)
+    path = csv_file_factory("test.csv", content)
     rows = reader_with_csvreader(path)[1]
 
     assert len(rows) == 2
@@ -37,9 +32,9 @@ def test_csvreader_file_not_found():
         reader.read("nonexistent.csv")
 
 
-def test_csvreader_empty_file(tmp_path):
+def test_csvreader_empty_file(csv_file_factory):
     content = ""
-    path = create_temp_csv(tmp_path, "empty.csv", content)
+    path = csv_file_factory("empty.csv", content)
     header, rows = reader_with_csvreader(path)
 
     assert header == []

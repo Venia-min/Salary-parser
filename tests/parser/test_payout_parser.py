@@ -1,67 +1,69 @@
-from parser.csv_parser import CsvReader
-from parser.payout_parser import PayoutParser, COLUMN_ALIASES
+from models.employee import Employee
 
 
-def create_temp_csv(tmp_path, filename, content):
-    path = tmp_path / filename
-    path.write_text(content)
-    return str(path)
+def test_parse_valid_file(csv_file_factory, payout_parser_factory):
+    content = "name,department,salary,hours\nAlice,Design,50,160\nBob,Design,60,150\n"
+    path = csv_file_factory("valid.csv", content)
 
-
-def parse_with_payout_parser(path: str) -> list[dict]:
-    parser = PayoutParser(CsvReader(), COLUMN_ALIASES)
-    return parser.parse(path)
-
-
-def test_parse_valid_file(tmp_path):
-    content = "name,salary,hours\nAlice,50,160\nBob,60,150\n"
-    path = create_temp_csv(tmp_path, "valid.csv", content)
-
-    result = parse_with_payout_parser(path)
+    result = payout_parser_factory().parse(path)
 
     assert result == [
-        {"name": "Alice", "rate": "50", "hours": "160"},
-        {"name": "Bob", "rate": "60", "hours": "150"},
+        Employee(name="Alice", department="Design", rate=50.0, hours=160.0),
+        Employee(name="Bob", department="Design", rate=60.0, hours=150.0),
     ]
 
 
-def test_parse_skips_invalid_rows(tmp_path):
-    content = "name,salary,hours_worked\nAlice,50\nBob,60,150\n"
-    path = create_temp_csv(tmp_path, "invalid.csv", content)
+def test_parse_skips_invalid_rows(csv_file_factory, payout_parser_factory):
+    content = "name,department,salary,hours\nAlice,Design,160\nBob,Design,60,150\n"
+    path = csv_file_factory("invalid.csv", content)
 
-    result = parse_with_payout_parser(path)
+    result = payout_parser_factory().parse(path)
 
     assert len(result) == 1
-    assert result[0]["name"] == "Bob"
+    assert result[0].name == "Bob"
 
 
-def test_parse_empty_file(tmp_path):
-    path = create_temp_csv(tmp_path, "empty.csv", "")
+def test_parse_empty_file(csv_file_factory, payout_parser_factory):
+    path = csv_file_factory("empty.csv", "")
 
-    result = parse_with_payout_parser(path)
+    result = payout_parser_factory().parse(path)
 
     assert result == []
 
 
-def test_parse_preserves_non_aliased_columns(tmp_path):
-    content = "email,salary,hours\nalice@example.com,40,100\n"
-    path = create_temp_csv(tmp_path, "mixed.csv", content)
+def test_parse_preserves_non_aliased_columns(csv_file_factory, payout_parser_factory):
+    content = (
+        "name,email,salary,hours,department\nAlice,alice@example.com,40,100,Design\n"
+    )
+    path = csv_file_factory("mixed.csv", content)
 
-    result = parse_with_payout_parser(path)
+    result = payout_parser_factory().parse(path)
 
-    assert result == [{"email": "alice@example.com", "rate": "40", "hours": "100"}]
+    assert len(result) == 1
+    employee = result[0]
+    assert isinstance(employee, Employee)
+    assert employee.name == "Alice"
+    assert employee.rate == 40.0
+    assert employee.hours == 100.0
+    assert employee.department == "Design"
 
 
-def test_load_combines_multiple_files(tmp_path):
-    content1 = "name,salary,hours\nAlice,40,100\n"
-    content2 = "name,rate,hours_worked\nBob,50,120\n"
+def test_load_combines_multiple_files(csv_file_factory, payout_parser_factory):
+    content1 = "name,salary,hours,department\nAlice,40,100,Design\n"
+    content2 = "name,rate,hours_worked,department\nBob,50,120,Marketing\n"
 
-    path1 = create_temp_csv(tmp_path, "file1.csv", content1)
-    path2 = create_temp_csv(tmp_path, "file2.csv", content2)
+    path1 = csv_file_factory("file1.csv", content1)
+    path2 = csv_file_factory("file2.csv", content2)
 
-    parser = PayoutParser(CsvReader(), COLUMN_ALIASES)
-    result = parser.load([path1, path2])
+    result = payout_parser_factory().load([path1, path2])
 
     assert len(result) == 2
-    assert result[0]["name"] == "Alice"
-    assert result[1]["name"] == "Bob"
+    assert result[0].name == "Alice"
+    assert result[0].rate == 40.0
+    assert result[0].hours == 100.0
+    assert result[0].department == "Design"
+
+    assert result[1].name == "Bob"
+    assert result[1].rate == 50.0
+    assert result[1].hours == 120.0
+    assert result[1].department == "Marketing"

@@ -1,16 +1,17 @@
 from collections import defaultdict
 from pathlib import Path
 
+from models.employee import Employee
 from output import SAVE_VARIANTS
-from parser.csv_parser import CsvReader
-from parser.payout_parser import PayoutParser, COLUMN_ALIASES
+from parsers.csv_parser import CsvReader
+from parsers.payout_parser import PayoutParser, COLUMN_ALIASES
 
 
 class PayoutReport:
     def __init__(self, files: list[str]):
         self.files = files
         self.parser = PayoutParser(CsvReader(), COLUMN_ALIASES)
-        self.raw_data: list[dict] = []
+        self.raw_data: list[Employee] = []
         self.report_data: dict[str, dict] = {}
 
     def load(self) -> None:
@@ -26,26 +27,18 @@ class PayoutReport:
         grouped_data = defaultdict(
             lambda: {"employees": [], "total_hours": 0, "total_payout": 0}
         )
-        for row in self.raw_data:
-            try:
-                hours = float(row.get("hours", 0))
-                rate = float(row.get("rate", 0))
-                payout = round(hours * rate, 2)
-            except (ValueError, TypeError):
-                continue
-
-            entry = {
-                "department": row.get("department", "Unknown"),
-                "name": row.get("name", "Unknown"),
-                "hours": hours,
-                "rate": rate,
-                "payout": payout,
-            }
-
-            dept = entry["department"]
-            grouped_data[dept]["employees"].append(entry)
-            grouped_data[dept]["total_hours"] += hours
-            grouped_data[dept]["total_payout"] += payout
+        for emp in self.raw_data:
+            dept = emp.department
+            grouped_data[dept]["employees"].append(
+                {
+                    "name": emp.name,
+                    "hours": emp.hours,
+                    "rate": emp.rate,
+                    "payout": emp.payout,
+                }
+            )
+            grouped_data[dept]["total_hours"] += emp.hours
+            grouped_data[dept]["total_payout"] += emp.payout
 
         self.report_data = dict(grouped_data)
 

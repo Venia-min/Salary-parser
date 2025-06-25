@@ -1,4 +1,4 @@
-from parser.utils import normalize_header
+from parsers.utils import normalize_header
 
 
 COLUMN_ALIASES = {
