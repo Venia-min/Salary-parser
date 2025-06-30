@@ -1,46 +1,48 @@
+import pytest
+
 from models.employee import Employee
 
 
-def test_parse_valid_file(csv_file_factory, payout_parser_factory):
-    content = "name,department,salary,hours\nAlice,Design,50,160\nBob,Design,60,150\n"
-    path = csv_file_factory("valid.csv", content)
-
+@pytest.mark.parametrize(
+    "content, expected",
+    [
+        (
+            "name,department,salary,hours\nAlice,Design,50,160\nBob,Design," "60,150\n",
+            [
+                Employee(name="Alice", department="Design", rate=50, hours=160),
+                Employee(name="Bob", department="Design", rate=60, hours=150),
+            ],
+        ),
+        (
+            "name,department,salary,hours\nAlice,Design,160\nBob,Design,60,150\n",
+            [Employee(name="Bob", department="Design", rate=60.0, hours=150.0)],
+        ),
+    ],
+)
+def test_parse_rows(csv_file_factory, payout_parser_factory, content, expected):
+    path = csv_file_factory("rows.csv", content)
     result = payout_parser_factory().parse(path)
 
-    assert result == [
-        Employee(name="Alice", department="Design", rate=50.0, hours=160.0),
-        Employee(name="Bob", department="Design", rate=60.0, hours=150.0),
-    ]
-
-
-def test_parse_skips_invalid_rows(csv_file_factory, payout_parser_factory):
-    content = "name,department,salary,hours\nAlice,Design,160\nBob,Design,60,150\n"
-    path = csv_file_factory("invalid.csv", content)
-
-    result = payout_parser_factory().parse(path)
-
-    assert len(result) == 1
-    assert result[0].name == "Bob"
+    assert result == expected
 
 
 def test_parse_empty_file(csv_file_factory, payout_parser_factory):
     path = csv_file_factory("empty.csv", "")
-
     result = payout_parser_factory().parse(path)
 
     assert result == []
 
 
-def test_parse_preserves_non_aliased_columns(csv_file_factory, payout_parser_factory):
+@pytest.mark.parametrize("header", ["salary", "rate", "hourly_rate"])
+def test_parse_with_aliases(csv_file_factory, payout_parser_factory, header):
     content = (
-        "name,email,salary,hours,department\nAlice,alice@example.com,40,100,Design\n"
+        f"name,email,{header},hours,department\nAlice,alice@example.com,40,100,Design\n"
     )
     path = csv_file_factory("mixed.csv", content)
-
     result = payout_parser_factory().parse(path)
+    employee = result[0]
 
     assert len(result) == 1
-    employee = result[0]
     assert isinstance(employee, Employee)
     assert employee.name == "Alice"
     assert employee.rate == 40.0

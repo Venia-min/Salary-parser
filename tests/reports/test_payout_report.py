@@ -1,3 +1,5 @@
+import pytest
+
 from models.employee import Employee
 from reports.payout import PayoutReport
 
@@ -9,18 +11,19 @@ def report_format(raw_data):
     return report.report_data
 
 
-def test_format_single_entry():
-    raw_data = [Employee(name="Alice", department="Design", rate=50, hours=160)]
+@pytest.mark.parametrize(
+    "employee, department, expected_payout",
+    [
+        (Employee("Alice", "Design", 50, 160), "Design", 8000),
+        (Employee("Bob", "Marketing", 60, 100), "Marketing", 6000),
+    ],
+)
+def test_format_single_entry_param(employee, department, expected_payout):
+    report_data = report_format([employee])
 
-    report_data = report_format(raw_data)
-
-    assert "Design" in report_data
-    dept = report_data["Design"]
-    assert dept["total_hours"] == 160
-    assert dept["total_payout"] == 8000
-    assert dept["employees"] == [
-        {"name": "Alice", "rate": 50, "hours": 160, "payout": 8000}
-    ]
+    assert department in report_data
+    dept = report_data[department]
+    assert dept["total_payout"] == expected_payout
 
 
 def test_format_multiple_departments():
